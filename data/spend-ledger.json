@@ -1,0 +1,72 @@
+[
+  {
+    "id": "660be784-7cc7-4917-9815-0baf597cf88a",
+    "timestamp": "2026-03-26T05:22:05.313Z",
+    "sessionId": "test-session-funded-blocked",
+    "providerId": "live-stock-quote",
+    "action": "paid",
+    "requestedUsd": 0.02,
+    "approvedUsd": 0.02,
+    "remainingBudgetUsd": 0.28,
+    "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
+    "paymentMode": "funded-wallet",
+    "walletId": "wallet-test-3",
+    "txHash": "0x47b09fdd7a3cebc698777fc9e75ff4143cb1dc42759733a52c15c1738b19765e"
+  },
+  {
+    "id": "4bf1d443-85bd-4181-a164-b2dea6dc8e80",
+    "timestamp": "2026-03-26T05:22:05.364Z",
+    "sessionId": "test-session-funded-blocked",
+    "providerId": "live-stock-quote",
+    "action": "paid",
+    "requestedUsd": 0.02,
+    "approvedUsd": 0.02,
+    "remainingBudgetUsd": 0.26,
+    "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
+    "paymentMode": "funded-wallet",
+    "walletId": "wallet-test-3",
+    "txHash": "0x9a6639e7e90adadd73e2ff7c562dff34feb25bf126199f5739ad091bcecabbf1"
+  },
+  {
+    "id": "f83efca8-5440-4dc4-b9e7-b65d2f3782e3",
+    "timestamp": "2026-03-26T05:22:05.383Z",
+    "sessionId": "test-session-funded-blocked",
+    "providerId": "premium-company-profile",
+    "action": "blocked",
+    "requestedUsd": 0.05,
+    "approvedUsd": 0,
+    "reason": "insufficient funded balance",
+    "remainingBudgetUsd": 0.21,
+    "requestSummary": "premium-company-profile: Research ExampleCorp and use premium tools if useful",
+    "paymentMode": "funded-wallet",
+    "walletId": "wallet-test-3"
+  },
+  {
+    "id": "4527692c-8982-4951-a8a9-bfc06853687f",
+    "timestamp": "2026-03-26T05:23:07.441Z",
+    "sessionId": "demo-session-1",
+    "providerId": "premium-company-profile",
+    "action": "paid",
+    "requestedUsd": 0.05,
+    "approvedUsd": 0.05,
+    "remainingBudgetUsd": 0.25,
+    "requestSummary": "premium-company-profile: Research ExampleCorp and use premium tools if useful",
+    "paymentMode": "funded-wallet",
+    "walletId": "wallet-demo-1",
+    "txHash": "0xa12fa0db17f672e40da985de48d551d0a7845934e652397ae84619815950c3a7"
+  },
+  {
+    "id": "e0c2e0ea-be52-4e87-b46e-e26b6ad8b63b",
+    "timestamp": "2026-03-26T05:23:13.041Z",
+    "sessionId": "demo-session-1",
+    "providerId": "live-stock-quote",
+    "action": "paid",
+    "requestedUsd": 0.02,
+    "approvedUsd": 0.02,
+    "remainingBudgetUsd": 0.23,
+    "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
+    "paymentMode": "funded-wallet",
+    "walletId": "wallet-demo-1",
+    "txHash": "0xf461c33df85355d4726f26529ec5cf593832b5e8e3425dc490cc9882cb964bc9"
+  }
+]

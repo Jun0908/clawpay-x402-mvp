@@ -1,0 +1,23 @@
+{
+  "name": "clawpay-x402-mvp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local MVP for buying paid APIs on demand with an x402-style flow for OpenClaw.",
+  "scripts": {
+    "dev": "tsx watch apps/web/src/server.ts",
+    "start": "tsx apps/web/src/server.ts",
+    "demo": "tsx apps/web/src/demo.ts",
+    "test": "tsx --test apps/web/src/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "@types/node": "^24.5.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}

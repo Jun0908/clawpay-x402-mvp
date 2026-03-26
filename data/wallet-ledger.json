@@ -1,0 +1,48 @@
+[
+  {
+    "id": "93527575-d426-4737-b88b-16dbf9552266",
+    "timestamp": "2026-03-26T05:22:55.909Z",
+    "walletId": "wallet-demo-1",
+    "action": "topup",
+    "amountUsd": 5,
+    "amountEth": 0.001563,
+    "status": "completed",
+    "sourceRef": "66c9848b-6536-4e5a-970a-d0c1c3ea1450",
+    "txHash": "0x1f1b4780c28e7be9476555674ab4cbc700216e998db555481c5bc8193e675c05",
+    "reason": "mock card top-up captured and assigned to Sepolia treasury"
+  },
+  {
+    "id": "c8e66622-af35-4704-ac07-7ef0ccf0a52d",
+    "timestamp": "2026-03-26T05:22:55.910Z",
+    "walletId": "wallet-demo-1",
+    "action": "swap",
+    "amountUsd": 5,
+    "amountEth": 0.001563,
+    "status": "completed",
+    "sourceRef": "66c9848b-6536-4e5a-970a-d0c1c3ea1450",
+    "txHash": "0x1f1b4780c28e7be9476555674ab4cbc700216e998db555481c5bc8193e675c05",
+    "reason": "demo ETH to USDC conversion completed on Sepolia hybrid mode"
+  },
+  {
+    "id": "c0736573-65a1-4cb7-9897-eb229d9c84fa",
+    "timestamp": "2026-03-26T05:23:07.432Z",
+    "walletId": "wallet-demo-1",
+    "action": "debit",
+    "amountUsd": 0.05,
+    "status": "completed",
+    "sourceRef": "demo-session-1:premium-company-profile:1774502587432",
+    "txHash": "0xa12fa0db17f672e40da985de48d551d0a7845934e652397ae84619815950c3a7",
+    "reason": "funded-wallet authorized premium-company-profile"
+  },
+  {
+    "id": "c11545e9-7515-47a4-9e0f-ee54940a9aa2",
+    "timestamp": "2026-03-26T05:23:13.034Z",
+    "walletId": "wallet-demo-1",
+    "action": "debit",
+    "amountUsd": 0.02,
+    "status": "completed",
+    "sourceRef": "demo-session-1:live-stock-quote:1774502593034",
+    "txHash": "0xf461c33df85355d4726f26529ec5cf593832b5e8e3425dc490cc9882cb964bc9",
+    "reason": "funded-wallet authorized live-stock-quote"
+  }
+]

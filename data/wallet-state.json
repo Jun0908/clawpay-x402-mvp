@@ -1,0 +1,12 @@
+[
+  {
+    "walletId": "wallet-demo-1",
+    "chain": "sepolia",
+    "address": "0xc0e5462b92828ac4917f7d9e79cf724aa11dc0ae",
+    "assetSymbol": "USDC",
+    "availableUsd": 4.93,
+    "pendingUsd": 0,
+    "spentUsd": 0.07,
+    "lastFundedAt": "2026-03-26T05:22:55.909Z"
+  }
+]
