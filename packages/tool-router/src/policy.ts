@@ -11,7 +11,10 @@ export function resolvePolicyConfig(input: ResolvedPolicyInput): PolicyConfig {
     maxPerSessionUsd: Math.min(
       Number(process.env.DEFAULT_MAX_PER_SESSION_USD ?? "0.30"),
       Number(input.budgetUsd.toFixed(2))
-    )
+    ),
+    maxPerDayUsd: Number(process.env.DEFAULT_MAX_PER_DAY_USD ?? "1.00"),
+    approvalRequiredAboveUsd: Number(process.env.APPROVAL_REQUIRED_ABOVE_USD ?? "0.20"),
+    maxSameProviderCallsPerSession: Number(process.env.MAX_SAME_PROVIDER_CALLS_PER_SESSION ?? "2")
   };
 }
 
@@ -21,40 +24,81 @@ export function evaluatePolicy(
   ledger: SpendLedger,
   policyConfig = resolvePolicyConfig(input)
 ): PolicyDecision {
-  const summary = ledger.getSessionSummary(input.sessionId);
-  const totalSpentBeforeUsd = summary.totalSpentUsd;
+  const sessionSummary = ledger.getSessionSummary(input.sessionId);
+  const totalSpentBeforeUsd = sessionSummary.totalSpentUsd;
+  const totalSpentTodayUsd = ledger.getDaySpendUsd();
+  const sameProviderCount = ledger.getSessionProviderPaidCount(input.sessionId, input.providerId);
+  const sameRequestCount = ledger.getSessionRequestPaidCount(input.sessionId, input.requestSummary);
 
   if (!policyConfig.allowlist.includes(input.providerId)) {
-    return {
-      allowed: false,
-      reason: "provider is not allowlisted",
-      remainingBudgetUsd: roundUsd(policyConfig.maxPerSessionUsd - totalSpentBeforeUsd),
-      totalSpentBeforeUsd
-    };
+    return denied("provider is not allowlisted", totalSpentBeforeUsd, totalSpentTodayUsd, policyConfig);
   }
 
   if (priceUsd > policyConfig.maxPerCallUsd) {
-    return {
-      allowed: false,
-      reason: "price exceeds maxPerCallUsd",
-      remainingBudgetUsd: roundUsd(policyConfig.maxPerSessionUsd - totalSpentBeforeUsd),
-      totalSpentBeforeUsd
-    };
+    return denied("price exceeds maxPerCallUsd", totalSpentBeforeUsd, totalSpentTodayUsd, policyConfig);
   }
 
   if (totalSpentBeforeUsd + priceUsd > policyConfig.maxPerSessionUsd) {
+    return denied("price exceeds remaining session budget", totalSpentBeforeUsd, totalSpentTodayUsd, policyConfig);
+  }
+
+  if (totalSpentTodayUsd + priceUsd > policyConfig.maxPerDayUsd) {
+    return denied("price exceeds maxPerDayUsd", totalSpentBeforeUsd, totalSpentTodayUsd, policyConfig);
+  }
+
+  if (sameProviderCount >= policyConfig.maxSameProviderCallsPerSession) {
+    return denied(
+      "same provider call limit reached for this session",
+      totalSpentBeforeUsd,
+      totalSpentTodayUsd,
+      policyConfig
+    );
+  }
+
+  if (sameRequestCount >= policyConfig.maxSameProviderCallsPerSession) {
+    return denied(
+      "repeated request pattern detected for this session",
+      totalSpentBeforeUsd,
+      totalSpentTodayUsd,
+      policyConfig
+    );
+  }
+
+  if (
+    typeof policyConfig.approvalRequiredAboveUsd === "number" &&
+    priceUsd > policyConfig.approvalRequiredAboveUsd
+  ) {
     return {
       allowed: false,
-      reason: "price exceeds remaining session budget",
+      action: "approval_required",
+      reason: "approval required above threshold",
       remainingBudgetUsd: roundUsd(policyConfig.maxPerSessionUsd - totalSpentBeforeUsd),
-      totalSpentBeforeUsd
+      totalSpentBeforeUsd,
+      totalSpentTodayUsd
     };
   }
 
   return {
     allowed: true,
     remainingBudgetUsd: roundUsd(policyConfig.maxPerSessionUsd - totalSpentBeforeUsd - priceUsd),
-    totalSpentBeforeUsd
+    totalSpentBeforeUsd,
+    totalSpentTodayUsd
+  };
+}
+
+function denied(
+  reason: string,
+  totalSpentBeforeUsd: number,
+  totalSpentTodayUsd: number,
+  policyConfig: PolicyConfig
+): PolicyDecision {
+  return {
+    allowed: false,
+    action: "blocked",
+    reason,
+    remainingBudgetUsd: roundUsd(policyConfig.maxPerSessionUsd - totalSpentBeforeUsd),
+    totalSpentBeforeUsd,
+    totalSpentTodayUsd
   };
 }
 

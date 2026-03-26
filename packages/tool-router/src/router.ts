@@ -4,6 +4,7 @@ import { SpendLedger } from "./ledger";
 import { evaluatePolicy } from "./policy";
 import { requestPaidResource, retryWithPayment } from "./paidClient";
 import { authorizePayment, refundPayment } from "./paymentStrategy";
+import { selectProvider } from "./providerSelection";
 import { ResolvedPolicyInput } from "./types";
 
 type RouterConfig = {
@@ -18,8 +19,9 @@ export async function executeTool(
   input: ToolExecutionInput,
   config: RouterConfig
 ): Promise<ToolExecutionResult> {
-  const providerId = resolveProviderId(input);
   const paymentMode = input.paymentMode ?? "x402-local";
+  const selection = selectProvider(input);
+  const providerId = selection.selectedProvider.providerId;
   const requestSummary = `${providerId}: ${input.task}`;
   const resolvedInput: ResolvedPolicyInput = {
     ...input,
@@ -27,7 +29,7 @@ export async function executeTool(
     requestSummary
   };
 
-  const sellerUrl = `${config.sellerBaseUrl}/seller/${providerId}`;
+  const sellerUrl = `${config.sellerBaseUrl}${selection.selectedProvider.endpoint}`;
 
   try {
     const initial = await requestPaidResource({
@@ -47,24 +49,30 @@ export async function executeTool(
         spendSummary: config.ledger.getSessionSummary(input.sessionId),
         events: [],
         paymentMode,
-        walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager)
+        walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager),
+        selectedProvider: selection.selectedProvider,
+        comparedProviders: selection.comparedProviders,
+        selectionReason: selection.selectionReason
       };
     }
 
     const decision = evaluatePolicy(resolvedInput, initial.requirement.amountUsd, config.ledger);
 
     if (!decision.allowed) {
+      const action = decision.action === "approval_required" ? "approval_required" : "blocked";
       const event = config.ledger.append({
         sessionId: input.sessionId,
         providerId,
-        action: "blocked",
+        action,
         requestedUsd: initial.requirement.amountUsd,
         approvedUsd: 0,
         reason: decision.reason,
         remainingBudgetUsd: decision.remainingBudgetUsd,
         requestSummary,
         paymentMode,
-        walletId: input.walletId
+        walletId: input.walletId,
+        comparedProviderIds: selection.comparedProviders.map((provider) => provider.providerId),
+        selectionReason: selection.selectionReason
       });
 
       return {
@@ -73,7 +81,10 @@ export async function executeTool(
         spendSummary: config.ledger.getSessionSummary(input.sessionId),
         events: [event],
         paymentMode,
-        walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager)
+        walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager),
+        selectedProvider: selection.selectedProvider,
+        comparedProviders: selection.comparedProviders,
+        selectionReason: selection.selectionReason
       };
     }
 
@@ -97,7 +108,9 @@ export async function executeTool(
         remainingBudgetUsd: decision.remainingBudgetUsd,
         requestSummary,
         paymentMode,
-        walletId: input.walletId
+        walletId: input.walletId,
+        comparedProviderIds: selection.comparedProviders.map((provider) => provider.providerId),
+        selectionReason: selection.selectionReason
       });
 
       return {
@@ -106,7 +119,10 @@ export async function executeTool(
         spendSummary: config.ledger.getSessionSummary(input.sessionId),
         events: [event],
         paymentMode,
-        walletState: paymentAuthorization.walletState
+        walletState: paymentAuthorization.walletState,
+        selectedProvider: selection.selectedProvider,
+        comparedProviders: selection.comparedProviders,
+        selectionReason: selection.selectionReason
       };
     }
 
@@ -144,7 +160,9 @@ export async function executeTool(
       requestSummary,
       paymentMode,
       walletId: input.walletId,
-      txHash: paymentAuthorization.txHash
+      txHash: paymentAuthorization.txHash,
+      comparedProviderIds: selection.comparedProviders.map((provider) => provider.providerId),
+      selectionReason: selection.selectionReason
     });
 
     return {
@@ -153,7 +171,10 @@ export async function executeTool(
       spendSummary: config.ledger.getSessionSummary(input.sessionId),
       events: [event],
       paymentMode,
-      walletState: paymentAuthorization.walletState
+      walletState: paymentAuthorization.walletState,
+      selectedProvider: selection.selectedProvider,
+      comparedProviders: selection.comparedProviders,
+      selectionReason: selection.selectionReason
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown router error";
@@ -170,7 +191,9 @@ export async function executeTool(
       remainingBudgetUsd,
       requestSummary,
       paymentMode,
-      walletId: input.walletId
+      walletId: input.walletId,
+      comparedProviderIds: selection.comparedProviders.map((provider) => provider.providerId),
+      selectionReason: selection.selectionReason
     });
 
     return {
@@ -179,7 +202,10 @@ export async function executeTool(
       spendSummary: config.ledger.getSessionSummary(input.sessionId),
       events: [event],
       paymentMode,
-      walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager)
+      walletState: resolveWalletState(paymentMode, input.walletId, config.walletManager),
+      selectedProvider: selection.selectedProvider,
+      comparedProviders: selection.comparedProviders,
+      selectionReason: selection.selectionReason
     };
   }
 }
@@ -194,17 +220,4 @@ function resolveWalletState(
   }
 
   return walletManager.getWallet(walletId);
-}
-
-function resolveProviderId(input: ToolExecutionInput): string {
-  if (input.providerId) {
-    return input.providerId;
-  }
-
-  const task = input.task.toLowerCase();
-  if (task.includes("deep report") || task.includes("expensive")) {
-    return "expensive-deep-report";
-  }
-
-  return input.allowedProviders[0] ?? "premium-company-profile";
 }

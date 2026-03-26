@@ -1,13 +1,40 @@
 [
   {
-    "id": "66c9848b-6536-4e5a-970a-d0c1c3ea1450",
-    "createdAt": "2026-03-26T05:22:55.908Z",
+    "id": "bd96b480-1f9a-4daa-ad6a-658567653c26",
+    "createdAt": "2026-03-26T06:13:41.948Z",
     "walletId": "wallet-demo-1",
+    "parentWalletId": "parent:wallet-demo-1",
+    "childWalletId": "wallet-demo-1",
     "source": "mock-card",
     "cardLast4": "4242",
     "requestedUsd": 5,
     "status": "funded",
-    "fundedAt": "2026-03-26T05:22:55.908Z",
-    "txHash": "0x1f1b4780c28e7be9476555674ab4cbc700216e998db555481c5bc8193e675c05"
+    "fundedAt": "2026-03-26T06:13:41.949Z",
+    "txHash": "0xa8fdd238a04b1198365510308b7c3482ca5be6904ab169c1b28b9710789c3ac4"
+  },
+  {
+    "id": "a45e4b49-a015-4569-823d-e24702f79f11",
+    "createdAt": "2026-03-26T06:24:40.952Z",
+    "walletId": "wallet-demo-1",
+    "parentWalletId": "parent:wallet-demo-1",
+    "childWalletId": "wallet-demo-1",
+    "source": "mock-card",
+    "cardLast4": "4242",
+    "requestedUsd": 5,
+    "status": "funded",
+    "fundedAt": "2026-03-26T06:24:40.953Z",
+    "txHash": "0x7ffb24925eb5951b897a778cd09dbc17a05642fcecacedfda2689d764add9ef3"
+  },
+  {
+    "id": "658ffd82-70c8-4b51-99da-562cf71ca20d",
+    "createdAt": "2026-03-26T06:41:32.600Z",
+    "walletId": "wallet-demo-1",
+    "parentWalletId": "parent:wallet-demo-1",
+    "childWalletId": "wallet-demo-1",
+    "source": "mock-card",
+    "cardLast4": "4242",
+    "requestedUsd": 5,
+    "status": "failed",
+    "reason": "top-up count exceeds maxTopupsPerDay"
   }
 ]

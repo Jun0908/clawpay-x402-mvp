@@ -1,7 +1,7 @@
 import http from "node:http";
 import express, { Express, Request } from "express";
 import { createSellerRouter } from "../../../packages/seller/src/server";
-import { sellerProviders } from "../../../packages/seller/src/premiumData";
+import { externalSellerProviders, getProviderQuotes, localSellerProviders } from "../../../packages/seller/src/premiumData";
 import { FundingService } from "../../../packages/funding/src/fundingService";
 import { FundingRequestStore } from "../../../packages/funding/src/fundingRequests";
 import { SpendLedger } from "../../../packages/tool-router/src/ledger";
@@ -46,7 +46,7 @@ export function createApp(services = createServices()): Express {
   });
 
   app.get("/api/providers", (_req, res) => {
-    res.json({ providers: Object.values(sellerProviders) });
+    res.json({ providers: getProviderQuotes() });
   });
 
   app.get("/api/logs", (req, res) => {
@@ -68,6 +68,8 @@ export function createApp(services = createServices()): Express {
     const fundingRequests = services.fundingService.getFundingRequests(walletId);
     res.json({
       wallet,
+      parentWallet: services.fundingService.getParentWallet(walletId),
+      hierarchy: services.fundingService.getWalletHierarchy(walletId),
       ledger,
       fundingRequests,
       config: services.fundingService.getConfig()
@@ -93,14 +95,24 @@ export function createApp(services = createServices()): Express {
     "/seller",
     createSellerRouter({
       buyerSharedSecret,
-      sellerWalletAddress
+      sellerWalletAddress,
+      providers: localSellerProviders
+    })
+  );
+
+  app.use(
+    "/external-seller",
+    createSellerRouter({
+      buyerSharedSecret,
+      sellerWalletAddress: `${sellerWalletAddress}-external`,
+      providers: externalSellerProviders
     })
   );
 
   return app;
 }
 
-export async function startServer(port = Number(process.env.PORT ?? "4020")): Promise<{
+export async function startServer(port = Number(process.env.PORT ?? "3000")): Promise<{
   app: Express;
   server: http.Server;
   services: AppServices;
@@ -300,12 +312,15 @@ function renderDashboardHtml(): string {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.92rem;
+        table-layout: fixed;
       }
       th, td {
         text-align: left;
         padding: 10px 8px;
         border-bottom: 1px solid var(--border);
         vertical-align: top;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
       .pill {
         display: inline-block;
@@ -316,7 +331,11 @@ function renderDashboardHtml(): string {
       }
       .pill.blocked { background: #fbd5d5; }
       .pill.wallet { background: #d8f5f2; }
-      .mono { font-family: "SFMono-Regular", Consolas, monospace; }
+      .mono {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        overflow-wrap: anywhere;
+        word-break: break-all;
+      }
       form label {
         display: block;
         margin-bottom: 10px;
@@ -355,8 +374,7 @@ function renderDashboardHtml(): string {
       <div class="hero">
         <section class="panel">
           <h1>ClawPay</h1>
-          <p>OpenClaw-compatible paid tool router with two payment paths: the original local x402 auto-pay flow, and a funded wallet flow that simulates mock card top-up into Sepolia ETH value and stores spendable USDC balance.</p>
-          <p class="small-note">Default session: <span class="mono">demo-session-1</span> | Default wallet: <span class="mono">${defaultWalletId}</span> | Chain: <span class="mono">Sepolia</span></p>
+          <p>Top up a wallet. Let the agent buy an API.</p>
         </section>
 
         <section class="panel">
@@ -379,14 +397,6 @@ function renderDashboardHtml(): string {
       </div>
 
       <div class="grid">
-        <section class="panel">
-          <h2>Local x402 Flow</h2>
-          <p>Original demo-safe x402 flow with automatic pay and retry.</p>
-          <button id="run-allowed">Run Allowed Lookup</button>
-          <button id="run-blocked" class="secondary">Run Blocked Lookup</button>
-          <button id="reset-spend" class="ghost">Reset Spend Ledger</button>
-        </section>
-
         <section class="panel">
           <h2>Fund Wallet</h2>
           <form id="topup-form">
@@ -428,29 +438,45 @@ function renderDashboardHtml(): string {
           <h2>Wallet Status</h2>
           <div class="wallet-metrics">
             <div class="metric">
-              <span>Available USDC</span>
+              <span>Child USDC</span>
               <strong id="wallet-available">$0.00</strong>
             </div>
             <div class="metric">
-              <span>Pending</span>
-              <strong id="wallet-pending">$0.00</strong>
+              <span>Parent USDC</span>
+              <strong id="parent-wallet-available">$0.00</strong>
+            </div>
+            <div class="metric">
+              <span>Allocated</span>
+              <strong id="wallet-allocated">$0.00</strong>
             </div>
             <div class="metric">
               <span>Spent</span>
               <strong id="wallet-spent">$0.00</strong>
             </div>
             <div class="metric">
-              <span>Address</span>
+              <span>Pending</span>
+              <strong id="wallet-pending">$0.00</strong>
+            </div>
+            <div class="metric">
+              <span>Child Wallet</span>
+              <strong id="wallet-id-display" class="mono" style="font-size:0.9rem;">-</strong>
+            </div>
+            <div class="metric">
+              <span>Child Address</span>
               <strong id="wallet-address" class="mono" style="font-size:0.9rem;">-</strong>
+            </div>
+            <div class="metric">
+              <span>Parent Wallet</span>
+              <strong id="parent-wallet-id" class="mono" style="font-size:0.9rem;">-</strong>
             </div>
           </div>
         </section>
 
         <section class="panel">
           <h2>Funded Wallet Spend</h2>
-          <p>Spend from wallet balance while keeping the seller-side 402 flow intact.</p>
-          <button id="run-funded-company" class="teal">Spend On Company Profile</button>
-          <button id="run-funded-stock" class="teal">Spend On Stock Quote</button>
+          <p>Router compares quotes, selects a provider, and spends from the child wallet.</p>
+          <button id="run-funded-company" class="teal">AI Select Company Provider</button>
+          <button id="run-funded-stock" class="teal">AI Select Stock Provider</button>
           <button id="run-funded-insufficient" class="secondary">Trigger Insufficient Balance</button>
         </section>
       </div>
@@ -549,7 +575,7 @@ function renderDashboardHtml(): string {
         const rows = payload.logs.length === 0
           ? '<tr><td colspan="5">No spend events yet.</td></tr>'
           : payload.logs.slice().reverse().map((log) => {
-              const pillClass = log.action === "blocked" ? "pill blocked" : "pill";
+              const pillClass = log.action === "blocked" || log.action === "approval_required" ? "pill blocked" : "pill";
               return '<tr>' +
                 '<td><span class="' + pillClass + '">' + log.action + '</span></td>' +
                 '<td><code>' + log.providerId + '</code></td>' +
@@ -566,11 +592,17 @@ function renderDashboardHtml(): string {
         const response = await fetch("/api/funding/wallet/" + encodeURIComponent(currentWalletId()));
         const payload = await response.json();
         const wallet = payload.wallet;
+        const parentWallet = payload.parentWallet;
+        const hierarchy = payload.hierarchy;
 
         document.getElementById("wallet-available").textContent = "$" + Number(wallet.availableUsd).toFixed(2);
+        document.getElementById("parent-wallet-available").textContent = "$" + Number(parentWallet.availableUsd).toFixed(2);
+        document.getElementById("wallet-allocated").textContent = "$" + Number(wallet.allocatedUsd).toFixed(2);
         document.getElementById("wallet-pending").textContent = "$" + Number(wallet.pendingUsd).toFixed(2);
         document.getElementById("wallet-spent").textContent = "$" + Number(wallet.spentUsd).toFixed(2);
+        document.getElementById("wallet-id-display").textContent = wallet.walletId;
         document.getElementById("wallet-address").textContent = wallet.address;
+        document.getElementById("parent-wallet-id").textContent = hierarchy.parentWalletId;
 
         const walletRows = payload.ledger.length === 0
           ? '<tr><td colspan="5">No wallet events yet.</td></tr>'
@@ -600,30 +632,11 @@ function renderDashboardHtml(): string {
         document.getElementById("funding-rows").innerHTML = fundingRows;
       }
 
-      document.getElementById("run-allowed").addEventListener("click", () => runScenario({
-        task: "Research ExampleCorp and use premium tools if useful",
-        sessionId,
-        budgetUsd: 0.30,
-        allowedProviders: ["premium-company-profile"],
-        providerId: "premium-company-profile",
-        paymentMode: "x402-local"
-      }));
-
-      document.getElementById("run-blocked").addEventListener("click", () => runScenario({
-        task: "Create an expensive deep report on ExampleCorp",
-        sessionId,
-        budgetUsd: 0.30,
-        allowedProviders: ["premium-company-profile", "expensive-deep-report"],
-        providerId: "expensive-deep-report",
-        paymentMode: "x402-local"
-      }));
-
       document.getElementById("run-funded-company").addEventListener("click", () => runScenario({
         task: "Research ExampleCorp and use premium tools if useful",
         sessionId,
         budgetUsd: 1.00,
-        allowedProviders: ["premium-company-profile"],
-        providerId: "premium-company-profile",
+        allowedProviders: ["premium-company-profile", "external-company-snapshot"],
         paymentMode: "funded-wallet",
         walletId: currentWalletId()
       }));
@@ -632,8 +645,7 @@ function renderDashboardHtml(): string {
         task: "Get a live stock quote for NVDA",
         sessionId,
         budgetUsd: 1.00,
-        allowedProviders: ["live-stock-quote"],
-        providerId: "live-stock-quote",
+        allowedProviders: ["live-stock-quote", "external-stock-snapshot"],
         paymentMode: "funded-wallet",
         walletId: currentWalletId()
       }));
@@ -642,8 +654,7 @@ function renderDashboardHtml(): string {
         task: "Research ExampleCorp and use premium tools if useful",
         sessionId,
         budgetUsd: 1.00,
-        allowedProviders: ["premium-company-profile"],
-        providerId: "premium-company-profile",
+        allowedProviders: ["premium-company-profile", "external-company-snapshot"],
         paymentMode: "funded-wallet",
         walletId: "wallet-low-balance"
       }));

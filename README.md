@@ -73,7 +73,7 @@ npm run start
 
 Then open:
 
-- `http://127.0.0.1:4020/`
+- `http://127.0.0.1:3000/`
 
 ## Dashboard walkthrough
 

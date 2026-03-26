@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
-import { WalletLedgerEntry, WalletState } from "../../shared/src/types";
+import { WalletHierarchy, WalletLedgerEntry, WalletState } from "../../shared/src/types";
 
 const walletStatePath = path.resolve(process.cwd(), "data", "wallet-state.json");
 const walletLedgerPath = path.resolve(process.cwd(), "data", "wallet-ledger.json");
@@ -15,7 +15,7 @@ export class WalletStore {
     ensureJsonFile(this.ledgerPath);
   }
 
-  getOrCreate(walletId: string): WalletState {
+  getOrCreate(walletId: string, role: "parent" | "child" = "child", parentWalletId?: string): WalletState {
     const wallets = this.readStates();
     const existing = wallets.find((wallet) => wallet.walletId === walletId);
     if (existing) {
@@ -24,17 +24,33 @@ export class WalletStore {
 
     const created: WalletState = {
       walletId,
+      role,
+      parentWalletId,
       chain: "sepolia",
       address: `0x${randomBytes(20).toString("hex")}`,
       assetSymbol: "USDC",
       availableUsd: 0,
       pendingUsd: 0,
-      spentUsd: 0
+      spentUsd: 0,
+      allocatedUsd: 0
     };
 
     wallets.push(created);
     this.writeStates(wallets);
     return created;
+  }
+
+  ensureHierarchy(childWalletId: string): WalletHierarchy {
+    const parentWalletId = `parent:${childWalletId}`;
+    this.getOrCreate(parentWalletId, "parent");
+    this.getOrCreate(childWalletId, "child", parentWalletId);
+
+    const child = this.getOrCreate(childWalletId, "child", parentWalletId);
+    return {
+      parentWalletId,
+      childWalletId: child.walletId,
+      allocatedUsd: child.availableUsd
+    };
   }
 
   get(walletId: string): WalletState | undefined {
@@ -71,7 +87,9 @@ export class WalletStore {
 
   getLedger(walletId?: string): WalletLedgerEntry[] {
     const entries = this.readLedger();
-    return walletId ? entries.filter((entry) => entry.walletId === walletId) : entries;
+    return walletId
+      ? entries.filter((entry) => entry.walletId === walletId || entry.relatedWalletId === walletId)
+      : entries;
   }
 
   reset(): void {
@@ -99,7 +117,8 @@ function sanitizeWallet(wallet: WalletState): WalletState {
     ...wallet,
     availableUsd: roundUsd(wallet.availableUsd),
     pendingUsd: roundUsd(wallet.pendingUsd),
-    spentUsd: roundUsd(wallet.spentUsd)
+    spentUsd: roundUsd(wallet.spentUsd),
+    allocatedUsd: roundUsd(wallet.allocatedUsd)
   };
 }
 

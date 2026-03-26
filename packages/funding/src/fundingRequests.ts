@@ -40,6 +40,18 @@ export class FundingRequestStore {
     return walletId ? items.filter((item) => item.walletId === walletId) : items;
   }
 
+  getTodaysCount(walletId: string, date = new Date()): number {
+    const prefix = date.toISOString().slice(0, 10);
+    return this.getByWallet(walletId).filter((item) => item.createdAt.startsWith(prefix)).length;
+  }
+
+  getTodaysTotalUsd(walletId: string, date = new Date()): number {
+    const prefix = date.toISOString().slice(0, 10);
+    return this.getByWallet(walletId)
+      .filter((item) => item.createdAt.startsWith(prefix) && item.status !== "failed")
+      .reduce((total, item) => total + item.requestedUsd, 0);
+  }
+
   reset(): void {
     writeFileSync(this.filePath, "[]\n");
   }

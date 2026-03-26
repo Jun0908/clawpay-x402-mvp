@@ -9,24 +9,6 @@ async function main(): Promise<void> {
     services.ledger.clear();
     services.fundingService.reset();
 
-    const allowed = await runScenario(baseUrl, {
-      task: "Research ExampleCorp and use premium tools if useful",
-      sessionId: "demo-session-1",
-      budgetUsd: 0.3,
-      allowedProviders: ["premium-company-profile"],
-      providerId: "premium-company-profile",
-      paymentMode: "x402-local"
-    });
-
-    const blocked = await runScenario(baseUrl, {
-      task: "Create an expensive deep report on ExampleCorp",
-      sessionId: "demo-session-1",
-      budgetUsd: 0.3,
-      allowedProviders: ["premium-company-profile", "expensive-deep-report"],
-      providerId: "expensive-deep-report",
-      paymentMode: "x402-local"
-    });
-
     const topup = await postJson(baseUrl, "/api/funding/topup", {
       walletId: "wallet-demo-1",
       amountUsd: 5,
@@ -35,32 +17,41 @@ async function main(): Promise<void> {
       cvc: "123"
     });
 
-    const fundedSpend = await runScenario(baseUrl, {
-      task: "Get a live stock quote for NVDA",
-      sessionId: "demo-session-2",
+    const companySelection = await runScenario(baseUrl, {
+      task: "Research ExampleCorp and use premium tools if useful",
+      sessionId: "demo-session-company",
       budgetUsd: 1.0,
-      allowedProviders: ["live-stock-quote"],
-      providerId: "live-stock-quote",
+      allowedProviders: ["premium-company-profile", "external-company-snapshot"],
+      paymentMode: "funded-wallet",
+      walletId: "wallet-demo-1"
+    });
+
+    const stockSelection = await runScenario(baseUrl, {
+      task: "Get a live stock quote for NVDA",
+      sessionId: "demo-session-stock",
+      budgetUsd: 1.0,
+      allowedProviders: ["live-stock-quote", "external-stock-snapshot"],
       paymentMode: "funded-wallet",
       walletId: "wallet-demo-1"
     });
 
     const walletState = await fetch(`${baseUrl}/api/funding/wallet/wallet-demo-1`).then((response) => response.json());
 
-    console.log("=== Local x402 allowed purchase ===");
-    console.log(JSON.stringify(allowed, null, 2));
-    console.log("");
-    console.log("=== Local x402 blocked purchase ===");
-    console.log(JSON.stringify(blocked, null, 2));
-    console.log("");
-    console.log("=== Mock card top-up to Sepolia hybrid wallet ===");
+    console.log("=== Top Up Child Wallet From Parent Wallet ===");
     console.log(JSON.stringify(topup, null, 2));
     console.log("");
-    console.log("=== Funded wallet spend ===");
-    console.log(JSON.stringify(fundedSpend, null, 2));
+    console.log("=== AI Selected Company Provider ===");
+    console.log(JSON.stringify(companySelection, null, 2));
     console.log("");
-    console.log("=== Wallet status ===");
-    console.log(JSON.stringify(walletState.wallet, null, 2));
+    console.log("=== AI Selected Stock Provider ===");
+    console.log(JSON.stringify(stockSelection, null, 2));
+    console.log("");
+    console.log("=== Wallet Hierarchy ===");
+    console.log(JSON.stringify({
+      parentWallet: walletState.parentWallet,
+      childWallet: walletState.wallet,
+      hierarchy: walletState.hierarchy
+    }, null, 2));
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));

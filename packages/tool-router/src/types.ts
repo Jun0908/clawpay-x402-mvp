@@ -7,9 +7,11 @@ export type ResolvedPolicyInput = ToolExecutionInput & {
 
 export type PolicyDecision = {
   allowed: boolean;
+  action?: "blocked" | "approval_required";
   reason?: string;
   remainingBudgetUsd: number;
   totalSpentBeforeUsd: number;
+  totalSpentTodayUsd?: number;
 };
 
 export type PaymentAuthorization =

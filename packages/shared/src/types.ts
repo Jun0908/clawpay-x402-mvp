@@ -11,10 +11,12 @@ export type PolicyConfig = {
   allowlist: string[];
   maxPerCallUsd: number;
   maxPerSessionUsd: number;
+  maxPerDayUsd: number;
   approvalRequiredAboveUsd?: number;
+  maxSameProviderCallsPerSession: number;
 };
 
-export type SpendLogAction = "paid" | "blocked" | "error";
+export type SpendLogAction = "paid" | "blocked" | "approval_required" | "error";
 
 export type SpendLog = {
   id: string;
@@ -30,6 +32,8 @@ export type SpendLog = {
   paymentMode?: PaymentMode;
   walletId?: string;
   txHash?: string;
+  comparedProviderIds?: string[];
+  selectionReason?: string;
 };
 
 export type SpendSummary = {
@@ -46,6 +50,7 @@ export type ToolExecutionInput = {
   providerId?: string;
   paymentMode?: PaymentMode;
   walletId?: string;
+  autoSelectProviders?: boolean;
 };
 
 export type ToolExecutionResult = {
@@ -55,6 +60,9 @@ export type ToolExecutionResult = {
   events: SpendLog[];
   paymentMode?: PaymentMode;
   walletState?: WalletState;
+  selectedProvider?: ProviderQuote;
+  comparedProviders?: ProviderQuote[];
+  selectionReason?: string;
 };
 
 export type PaymentMode = "x402-local" | "funded-wallet";
@@ -100,6 +108,8 @@ export type SettlementResponse = {
 export type FundingRequest = {
   id: string;
   walletId: string;
+  parentWalletId?: string;
+  childWalletId?: string;
   source: "mock-card";
   cardLast4: string;
   requestedUsd: number;
@@ -112,16 +122,19 @@ export type FundingRequest = {
 
 export type WalletState = {
   walletId: string;
+  role: "parent" | "child";
+  parentWalletId?: string;
   chain: "sepolia";
   address: string;
   assetSymbol: "USDC";
   availableUsd: number;
   pendingUsd: number;
   spentUsd: number;
+  allocatedUsd: number;
   lastFundedAt?: string;
 };
 
-export type WalletLedgerAction = "topup" | "swap" | "debit" | "refund" | "error";
+export type WalletLedgerAction = "topup" | "swap" | "allocation" | "debit" | "refund" | "error";
 
 export type WalletLedgerEntry = {
   id: string;
@@ -134,11 +147,14 @@ export type WalletLedgerEntry = {
   txHash?: string;
   reason?: string;
   timestamp: string;
+  relatedWalletId?: string;
 };
 
 export type FundingConfig = {
   minTopupUsd: number;
   maxTopupUsd: number;
+  maxTopupsPerDay: number;
+  maxTopupPerDayUsd: number;
   defaultChain: "sepolia";
   swapMode: "demo" | "onchain";
 };
@@ -149,4 +165,20 @@ export type TopUpInput = {
   cardNumber: string;
   expiry: string;
   cvc: string;
+};
+
+export type WalletHierarchy = {
+  parentWalletId: string;
+  childWalletId: string;
+  allocatedUsd: number;
+};
+
+export type ProviderQuote = {
+  providerId: string;
+  name: string;
+  priceUsd: number;
+  category: ProviderCategory;
+  description: string;
+  endpoint: string;
+  source: "local" | "external";
 };

@@ -40,8 +40,33 @@ export class SpendLedger {
         sessionLogs.reduce((total, entry) => total + (entry.action === "paid" ? entry.approvedUsd : 0), 0)
       ),
       callsPaid: sessionLogs.filter((entry) => entry.action === "paid").length,
-      callsBlocked: sessionLogs.filter((entry) => entry.action === "blocked").length
+      callsBlocked: sessionLogs.filter(
+        (entry) => entry.action === "blocked" || entry.action === "approval_required"
+      ).length
     };
+  }
+
+  getDayLogs(date = new Date()): SpendLog[] {
+    const prefix = isoDate(date);
+    return this.readAll().filter((entry) => entry.timestamp.startsWith(prefix));
+  }
+
+  getDaySpendUsd(date = new Date()): number {
+    return roundUsd(
+      this.getDayLogs(date).reduce((total, entry) => total + (entry.action === "paid" ? entry.approvedUsd : 0), 0)
+    );
+  }
+
+  getSessionProviderPaidCount(sessionId: string, providerId: string): number {
+    return this.getSessionLogs(sessionId).filter(
+      (entry) => entry.providerId === providerId && entry.action === "paid"
+    ).length;
+  }
+
+  getSessionRequestPaidCount(sessionId: string, requestSummary: string): number {
+    return this.getSessionLogs(sessionId).filter(
+      (entry) => entry.requestSummary === requestSummary && entry.action === "paid"
+    ).length;
   }
 
   clear(): void {
@@ -63,4 +88,8 @@ function ensureLedgerFile(filePath: string): void {
 
 function roundUsd(value: number): number {
   return Number(value.toFixed(2));
+}
+
+function isoDate(date: Date): string {
+  return date.toISOString().slice(0, 10);
 }

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { buildPaymentRequirement, buildSettlementResponse, decodeBase64Json, encodeBase64Json, verifySignedPayment, x402Headers } from "../../shared/src/x402";
 import { PaymentRequirement, SignedPayment } from "../../shared/src/types";
-import { buildSellerResult, getSellerProvider, sellerProviders } from "./premiumData";
+import { buildSellerResult, SellerProvider } from "./premiumData";
 
 type PendingPayment = {
   requirement: PaymentRequirement;
@@ -11,6 +11,7 @@ type PendingPayment = {
 type SellerConfig = {
   buyerSharedSecret: string;
   sellerWalletAddress: string;
+  providers: Record<string, SellerProvider>;
 };
 
 const pendingPayments = new Map<string, PendingPayment>();
@@ -19,7 +20,7 @@ export function createSellerRouter(config: SellerConfig): Router {
   const router = Router();
 
   router.get("/providers", (_req, res) => {
-    res.json({ providers: Object.values(sellerProviders) });
+    res.json({ providers: Object.values(config.providers) });
   });
 
   router.post("/:providerId", (req, res) => {
@@ -31,7 +32,7 @@ export function createSellerRouter(config: SellerConfig): Router {
 
 async function handlePaidRequest(req: Request, res: Response, config: SellerConfig): Promise<void> {
   const providerId = typeof req.params.providerId === "string" ? req.params.providerId : undefined;
-  const provider = providerId ? getSellerProvider(providerId) : undefined;
+  const provider = providerId ? config.providers[providerId] : undefined;
 
   if (!provider) {
     res.status(404).json({ error: "Unknown paid provider." });

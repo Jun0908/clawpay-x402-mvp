@@ -7,7 +7,7 @@
     "dev": "tsx watch apps/web/src/server.ts",
     "start": "tsx apps/web/src/server.ts",
     "demo": "tsx apps/web/src/demo.ts",
-    "test": "tsx --test apps/web/src/*.test.ts",
+    "test": "tsx --test --test-concurrency=1 apps/web/src/*.test.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.json"
   },
