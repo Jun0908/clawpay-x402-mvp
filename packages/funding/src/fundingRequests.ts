@@ -2,8 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { FundingRequest } from "../../shared/src/types";
+import { getRuntimeDataDir } from "../../shared/src/runtimePaths";
 
-const fundingRequestsPath = path.resolve(process.cwd(), "data", "funding-requests.json");
+const fundingRequestsPath = path.join(getRuntimeDataDir(), "funding-requests.json");
 
 export class FundingRequestStore {
   constructor(private readonly filePath = fundingRequestsPath) {

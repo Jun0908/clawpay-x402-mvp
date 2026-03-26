@@ -1,50 +1,27 @@
 [
   {
-    "walletId": "parent:wallet-demo-1",
+    "walletId": "parent:wallet-test-3",
     "role": "parent",
     "chain": "sepolia",
-    "address": "0x4d38ba14207ea51d3ccd8770ae512b6fa16f20d8",
+    "address": "0x6a02bad6182f21bc86cc2f187735fae8a2e17096",
     "assetSymbol": "USDC",
     "availableUsd": 0,
     "pendingUsd": 0,
     "spentUsd": 0,
-    "allocatedUsd": 10,
-    "lastFundedAt": "2026-03-26T06:24:40.956Z"
+    "allocatedUsd": 0.05,
+    "lastFundedAt": "2026-03-26T07:13:08.098Z"
   },
   {
-    "walletId": "wallet-demo-1",
+    "walletId": "wallet-test-3",
     "role": "child",
-    "parentWalletId": "parent:wallet-demo-1",
+    "parentWalletId": "parent:wallet-test-3",
     "chain": "sepolia",
-    "address": "0xbd7aa92d64c9d7d42cee0213c493488423df1d84",
+    "address": "0x855c80117f6befe2648ea333c17674bde5e43cb1",
     "assetSymbol": "USDC",
-    "availableUsd": 9.9,
+    "availableUsd": 0.01,
     "pendingUsd": 0,
-    "spentUsd": 0.1,
-    "allocatedUsd": 10,
-    "lastFundedAt": "2026-03-26T06:24:40.956Z"
-  },
-  {
-    "walletId": "parent:wallet-low-balance",
-    "role": "parent",
-    "chain": "sepolia",
-    "address": "0x257a24e958855ad540d1bb50516ada1b0be8717b",
-    "assetSymbol": "USDC",
-    "availableUsd": 0,
-    "pendingUsd": 0,
-    "spentUsd": 0,
-    "allocatedUsd": 0
-  },
-  {
-    "walletId": "wallet-low-balance",
-    "role": "child",
-    "parentWalletId": "parent:wallet-low-balance",
-    "chain": "sepolia",
-    "address": "0x3f6ef666868bf84ccd0b948f75d6c37dde464fa2",
-    "assetSymbol": "USDC",
-    "availableUsd": 0,
-    "pendingUsd": 0,
-    "spentUsd": 0,
-    "allocatedUsd": 0
+    "spentUsd": 0.04,
+    "allocatedUsd": 0.05,
+    "lastFundedAt": "2026-03-26T07:13:08.099Z"
   }
 ]

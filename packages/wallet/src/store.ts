@@ -2,9 +2,10 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { WalletHierarchy, WalletLedgerEntry, WalletState } from "../../shared/src/types";
+import { getRuntimeDataDir } from "../../shared/src/runtimePaths";
 
-const walletStatePath = path.resolve(process.cwd(), "data", "wallet-state.json");
-const walletLedgerPath = path.resolve(process.cwd(), "data", "wallet-ledger.json");
+const walletStatePath = path.join(getRuntimeDataDir(), "wallet-state.json");
+const walletLedgerPath = path.join(getRuntimeDataDir(), "wallet-ledger.json");
 
 export class WalletStore {
   constructor(

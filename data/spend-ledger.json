@@ -1,27 +1,8 @@
 [
   {
-    "id": "e618d77c-a5ef-4ea6-8230-3ed62991a844",
-    "timestamp": "2026-03-26T06:10:45.441Z",
-    "sessionId": "demo-session-company",
-    "providerId": "external-company-snapshot",
-    "action": "paid",
-    "requestedUsd": 0.03,
-    "approvedUsd": 0.03,
-    "remainingBudgetUsd": 0.27,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0x8584f0529ecd6f149cd0c56ad954f63db0019cb538188e7ba5c4462f6cdfa360",
-    "comparedProviderIds": [
-      "external-company-snapshot",
-      "premium-company-profile"
-    ],
-    "selectionReason": "selected cheapest company provider for task"
-  },
-  {
-    "id": "b0c78478-2bbc-45e1-a246-fca4d0233eb1",
-    "timestamp": "2026-03-26T06:10:45.468Z",
-    "sessionId": "demo-session-stock",
+    "id": "0f95fd8f-f31e-422c-bcdd-50d9f1240ce2",
+    "timestamp": "2026-03-26T07:13:08.141Z",
+    "sessionId": "test-session-funded-blocked",
     "providerId": "live-stock-quote",
     "action": "paid",
     "requestedUsd": 0.02,
@@ -29,145 +10,47 @@
     "remainingBudgetUsd": 0.28,
     "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
     "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0xd17daadb1f02a8d3d6515424d7aab6a171014e191bac0213b10e7fe9cdc16a5e",
+    "walletId": "wallet-test-3",
+    "txHash": "0x66d3e539fec38cd10777ba2b3c874c8fbe18121b40a9ac268b1e987f88148ea2",
     "comparedProviderIds": [
-      "live-stock-quote",
-      "external-stock-snapshot"
+      "live-stock-quote"
     ],
-    "selectionReason": "selected cheapest market provider for task"
+    "selectionReason": "provider explicitly requested by caller"
   },
   {
-    "id": "4226c7a2-5280-49eb-8d72-0c7a2476dbb5",
-    "timestamp": "2026-03-26T06:13:45.938Z",
-    "sessionId": "demo-session-1",
-    "providerId": "external-company-snapshot",
-    "action": "paid",
-    "requestedUsd": 0.03,
-    "approvedUsd": 0.03,
-    "remainingBudgetUsd": 0.27,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0x0b19ae06f670fd5d1a00c73c942121a4fe5871fa7f144d8f08bcd6bf9655705e",
-    "comparedProviderIds": [
-      "external-company-snapshot",
-      "premium-company-profile"
-    ],
-    "selectionReason": "selected cheapest company provider for task"
-  },
-  {
-    "id": "63db6c7c-febd-4fca-94e0-5b8426786e0d",
-    "timestamp": "2026-03-26T06:13:48.785Z",
-    "sessionId": "demo-session-1",
+    "id": "65a43a84-a4d9-4eea-b326-5415e5b4f741",
+    "timestamp": "2026-03-26T07:13:08.168Z",
+    "sessionId": "other-session-funded-blocked",
     "providerId": "live-stock-quote",
     "action": "paid",
     "requestedUsd": 0.02,
     "approvedUsd": 0.02,
-    "remainingBudgetUsd": 0.25,
+    "remainingBudgetUsd": 0.28,
     "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
     "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0x44170ff3351fcc369fff02d9d174db61f1eb4fc5bdd4615177dd8268afa5e6a9",
+    "walletId": "wallet-test-3",
+    "txHash": "0xb9375c31f97a92cbca3cbff8e4535d3ad36e46644456a6cd62454d39018d1b97",
     "comparedProviderIds": [
-      "live-stock-quote",
-      "external-stock-snapshot"
+      "live-stock-quote"
     ],
-    "selectionReason": "selected cheapest market provider for task"
+    "selectionReason": "provider explicitly requested by caller"
   },
   {
-    "id": "5baeec90-a2a8-46d9-85ae-a95a52c8d40c",
-    "timestamp": "2026-03-26T06:13:50.194Z",
-    "sessionId": "demo-session-1",
-    "providerId": "external-company-snapshot",
+    "id": "147c79a9-75c1-4c92-b4f1-60fd11798667",
+    "timestamp": "2026-03-26T07:13:08.181Z",
+    "sessionId": "test-session-funded-blocked",
+    "providerId": "premium-company-profile",
     "action": "blocked",
-    "requestedUsd": 0.03,
+    "requestedUsd": 0.05,
     "approvedUsd": 0,
     "reason": "insufficient funded balance",
-    "remainingBudgetUsd": 0.22,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
+    "remainingBudgetUsd": 0.23,
+    "requestSummary": "premium-company-profile: Research ExampleCorp and use premium tools if useful",
     "paymentMode": "funded-wallet",
-    "walletId": "wallet-low-balance",
+    "walletId": "wallet-test-3",
     "comparedProviderIds": [
-      "external-company-snapshot",
       "premium-company-profile"
     ],
-    "selectionReason": "selected cheapest company provider for task"
-  },
-  {
-    "id": "55cbf968-7cd4-4822-8600-e7136afefdd1",
-    "timestamp": "2026-03-26T06:24:46.976Z",
-    "sessionId": "demo-session-1",
-    "providerId": "external-company-snapshot",
-    "action": "paid",
-    "requestedUsd": 0.03,
-    "approvedUsd": 0.03,
-    "remainingBudgetUsd": 0.22,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0x3787b14594a49504dff170ce937b232ecf37ba87ed372483fbc65993b98aa4c3",
-    "comparedProviderIds": [
-      "external-company-snapshot",
-      "premium-company-profile"
-    ],
-    "selectionReason": "selected cheapest company provider for task"
-  },
-  {
-    "id": "282db856-77f4-45d4-9d2c-053532e69806",
-    "timestamp": "2026-03-26T06:24:57.173Z",
-    "sessionId": "demo-session-1",
-    "providerId": "live-stock-quote",
-    "action": "paid",
-    "requestedUsd": 0.02,
-    "approvedUsd": 0.02,
-    "remainingBudgetUsd": 0.2,
-    "requestSummary": "live-stock-quote: Get a live stock quote for NVDA",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "txHash": "0xb94f2dc60fcb10668d73eac8f35d140be8af2d3f8f62e296bcb9d6f0cf871c68",
-    "comparedProviderIds": [
-      "live-stock-quote",
-      "external-stock-snapshot"
-    ],
-    "selectionReason": "selected cheapest market provider for task"
-  },
-  {
-    "id": "3c2c49df-e28d-4b5f-86cd-974187d7e36f",
-    "timestamp": "2026-03-26T06:25:24.879Z",
-    "sessionId": "demo-session-1",
-    "providerId": "external-company-snapshot",
-    "action": "blocked",
-    "requestedUsd": 0.03,
-    "approvedUsd": 0,
-    "reason": "same provider call limit reached for this session",
-    "remainingBudgetUsd": 0.2,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-low-balance",
-    "comparedProviderIds": [
-      "external-company-snapshot",
-      "premium-company-profile"
-    ],
-    "selectionReason": "selected cheapest company provider for task"
-  },
-  {
-    "id": "7cb0833c-4e2a-4ee0-bbb6-57dd225b738b",
-    "timestamp": "2026-03-26T06:41:37.893Z",
-    "sessionId": "demo-session-1",
-    "providerId": "external-company-snapshot",
-    "action": "blocked",
-    "requestedUsd": 0.03,
-    "approvedUsd": 0,
-    "reason": "same provider call limit reached for this session",
-    "remainingBudgetUsd": 0.2,
-    "requestSummary": "external-company-snapshot: Research ExampleCorp and use premium tools if useful",
-    "paymentMode": "funded-wallet",
-    "walletId": "wallet-demo-1",
-    "comparedProviderIds": [
-      "external-company-snapshot",
-      "premium-company-profile"
-    ],
-    "selectionReason": "selected cheapest company provider for task"
+    "selectionReason": "provider explicitly requested by caller"
   }
 ]

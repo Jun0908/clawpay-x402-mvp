@@ -2,8 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { SpendLog, SpendSummary } from "../../shared/src/types";
+import { getRuntimeDataDir } from "../../shared/src/runtimePaths";
 
-const DEFAULT_LEDGER_PATH = path.resolve(process.cwd(), "data", "spend-ledger.json");
+const DEFAULT_LEDGER_PATH = path.join(getRuntimeDataDir(), "spend-ledger.json");
 
 export class SpendLedger {
   constructor(private readonly ledgerPath = DEFAULT_LEDGER_PATH) {
