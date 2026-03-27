@@ -13,8 +13,7 @@ export class SpendLedger {
 
   readAll(): SpendLog[] {
     ensureLedgerFile(this.ledgerPath);
-    const raw = readFileSync(this.ledgerPath, "utf8");
-    return JSON.parse(raw) as SpendLog[];
+    return readJsonArray<SpendLog>(this.ledgerPath);
   }
 
   append(entry: Omit<SpendLog, "id" | "timestamp">): SpendLog {
@@ -84,6 +83,22 @@ function ensureLedgerFile(filePath: string): void {
 
   if (!existsSync(filePath)) {
     writeFileSync(filePath, "[]\n");
+  }
+}
+
+function readJsonArray<T>(filePath: string): T[] {
+  const raw = readFileSync(filePath, "utf8").trim();
+
+  if (!raw) {
+    writeFileSync(filePath, "[]\n");
+    return [];
+  }
+
+  try {
+    return JSON.parse(raw) as T[];
+  } catch {
+    writeFileSync(filePath, "[]\n");
+    return [];
   }
 }
 

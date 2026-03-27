@@ -1,0 +1,31 @@
+<svg width="720" height="220" viewBox="0 0 720 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ClawPay logo</title>
+  <desc id="desc">A calm wordmark and symbol for ClawPay, an x402-style agent wallet.</desc>
+  <defs>
+    <linearGradient id="panel" x1="40" y1="28" x2="680" y2="192" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F1E6"/>
+      <stop offset="1" stop-color="#EFE3CF"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="84" y1="58" x2="164" y2="154" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F6B5B"/>
+      <stop offset="1" stop-color="#B7791F"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="16" y="16" width="688" height="188" rx="28" fill="url(#panel)"/>
+  <rect x="16.75" y="16.75" width="686.5" height="186.5" rx="27.25" stroke="#D8CAB0" stroke-width="1.5"/>
+
+  <rect x="48" y="48" width="152" height="124" rx="28" fill="#FFF9F0" stroke="#D8CAB0" stroke-width="1.5"/>
+  <circle cx="91" cy="110" r="10" fill="#1C4D43"/>
+  <circle cx="124" cy="80" r="10" fill="#1C4D43"/>
+  <circle cx="158" cy="110" r="10" fill="#1C4D43"/>
+  <path d="M91 110C104 101 111 91 124 80C137 91 145 101 158 110" stroke="url(#mark)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M90 133C104 145 145 145 159 133" stroke="#C48A31" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="124" cy="141" r="15" fill="#FFF9F0" stroke="#1C4D43" stroke-width="3"/>
+  <path d="M118 141H130" stroke="#1C4D43" stroke-width="3" stroke-linecap="round"/>
+  <path d="M124 135V147" stroke="#1C4D43" stroke-width="3" stroke-linecap="round"/>
+
+  <text x="236" y="95" fill="#231F1A" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="700" letter-spacing="0.2">ClawPay</text>
+  <text x="238" y="126" fill="#6B6258" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="0.4">x402-style agent wallet</text>
+  <text x="238" y="156" fill="#6B6258" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="0.2">Buy on demand, route with guardrails.</text>
+</svg>

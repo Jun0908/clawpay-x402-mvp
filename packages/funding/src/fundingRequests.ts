@@ -59,7 +59,7 @@ export class FundingRequestStore {
 
   private readAll(): FundingRequest[] {
     ensureFile(this.filePath);
-    return JSON.parse(readFileSync(this.filePath, "utf8")) as FundingRequest[];
+    return readJsonArray<FundingRequest>(this.filePath);
   }
 
   private writeAll(items: FundingRequest[]): void {
@@ -76,5 +76,21 @@ function ensureFile(filePath: string): void {
 
   if (!existsSync(filePath)) {
     writeFileSync(filePath, "[]\n");
+  }
+}
+
+function readJsonArray<T>(filePath: string): T[] {
+  const raw = readFileSync(filePath, "utf8").trim();
+
+  if (!raw) {
+    writeFileSync(filePath, "[]\n");
+    return [];
+  }
+
+  try {
+    return JSON.parse(raw) as T[];
+  } catch {
+    writeFileSync(filePath, "[]\n");
+    return [];
   }
 }

@@ -100,7 +100,7 @@ export class WalletStore {
 
   private readStates(): WalletState[] {
     ensureJsonFile(this.statePath);
-    return JSON.parse(readFileSync(this.statePath, "utf8")) as WalletState[];
+    return readJsonArray<WalletState>(this.statePath);
   }
 
   private writeStates(wallets: WalletState[]): void {
@@ -109,7 +109,7 @@ export class WalletStore {
 
   private readLedger(): WalletLedgerEntry[] {
     ensureJsonFile(this.ledgerPath);
-    return JSON.parse(readFileSync(this.ledgerPath, "utf8")) as WalletLedgerEntry[];
+    return readJsonArray<WalletLedgerEntry>(this.ledgerPath);
   }
 }
 
@@ -132,6 +132,22 @@ function ensureJsonFile(filePath: string): void {
 
   if (!existsSync(filePath)) {
     writeFileSync(filePath, "[]\n");
+  }
+}
+
+function readJsonArray<T>(filePath: string): T[] {
+  const raw = readFileSync(filePath, "utf8").trim();
+
+  if (!raw) {
+    writeFileSync(filePath, "[]\n");
+    return [];
+  }
+
+  try {
+    return JSON.parse(raw) as T[];
+  } catch {
+    writeFileSync(filePath, "[]\n");
+    return [];
   }
 }
 
